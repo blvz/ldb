@@ -64,9 +64,9 @@ namespace ldb {
   void startREPL();
   void find(string exp, int type);
   void auto_completion(const char *buf, linenoiseCompletions *lc);
-  void put_value(string key, string value);
-  void get_value(string key);
-  void del_value(string key);
+  void put_value(leveldb::Slice key, string value);
+  void get_value(leveldb::Slice key);
+  void del_value(leveldb::Slice key);
   void get_size();
   void range(string prefix, bool surpress_output);
   command parse_cmd(const string& line, const vector<cDef>& cmds);

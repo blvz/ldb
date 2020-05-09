@@ -52,22 +52,23 @@ R"(ldb
 
     Usage:
       ldb <path> [--create] [--error] [--size] [--nocompress]
-      ldb <path> (del|get) <key>
-      ldb <path> put <key> <value> [--nocompress]
+      ldb <path> (del|get) <key> [--domain=<domain>]
+      ldb <path> put <key> <value> [--domain=<domain>] [--nocompress]
       ldb <path> keys [--limit=<n>] [--lower=<lower>] [--upper=<upper>]
       ldb (-h | --help)
       ldb --version
 
     Options:
-      -h --help        Show this screen.
-      --create         Create the database if it does not exist.
-      --error          Throw an error if the databse does not exist.
-      --size           Get the size of the current range.
-      --limit=<n>      Limit the number of records in the current range.
-      --lower=<lower>  The lower bound value to end the range.
-      --upper=<upper>  The upper bound value to start the range.
-      --nocompress     Do not use compression.
-      --version        Show version.
+      -h --help          Show this screen.
+      --create           Create the database if it does not exist.
+      --error            Throw an error if the databse does not exist.
+      --size             Get the size of the current range.
+      --limit=<n>        Limit the number of records in the current range.
+      --lower=<lower>    The lower bound value to end the range.
+      --upper=<upper>    The upper bound value to start the range.
+      --domain=<domain>  Domain of (Chromium) LocalStorage key.
+      --nocompress       Do not use compression.
+      --version          Show version.
 )";
 
 //
@@ -144,24 +145,33 @@ int main(int argc, const char** argv)
     return 0;
   }
 
-  if (args["get"] && args["get"].asBool()) {
-    ldb::get_value(args["<key>"].asString());
+  if (args["keys"] && args["keys"].asBool()) {
+    ldb::range("", false);
+    return 0;
+  }
+
+  leveldb::Slice key;
+  if (args["--domain"]) {
+    const string prefix = "_" + args["--domain"].asString() + string("\0\1", 2);
+    key = prefix + args["<key>"].asString();
+  }
+  else {
+    key = args["<key>"].asString();
+  }
+
+  if (args["del"] && args["del"].asBool()) {
+    ldb::del_value(key);
+  }
+  else if (args["get"] && args["get"].asBool()) {
+    ldb::get_value(key);
   }
   else if (args["put"] && args["put"].asBool()) {
-
-    string key = args["<key>"].asString();
     string value = args["<value>"].asString();
 
     if (key.size() == 0 || value.size() == 0) {
       return 1;
     }
     ldb::put_value(key, value);
-  }
-  else if (args["del"] && args["del"].asBool()) {
-    ldb::del_value(args["<key>"].asString());
-  }
-  else if (args["keys"] && args["keys"].asBool()) {
-    ldb::range("", false);
   }
 
   return 0;

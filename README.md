@@ -1,5 +1,20 @@
 ![img](/man/logo.png)
 
+# blvz's Fork
+Adds the `--domain=<domain>` option to work with Chromium's LocalStorage.
+
+Electron app example:
+
+```js
+localStorage.setItem('my_key', 'some value')
+```
+
+```sh
+$ ldb ~/Library/Application\ Support/MyElectronApp/Local\ Storage/leveldb get my_key --domain=file://
+some value
+$
+```
+
 # SYNOPSIS
 A c++ repl and cli tool for leveldb
 

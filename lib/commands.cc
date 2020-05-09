@@ -13,7 +13,7 @@ bool replace(string& str, const string& from, const string& to) {
 //
 //
 //
-void ldb::put_value(string key, string value) {
+void ldb::put_value(leveldb::Slice key, string value) {
   leveldb::WriteOptions writeOptions;
   leveldb::Status status;
   status = db->Put(writeOptions, key, value);
@@ -25,14 +25,14 @@ void ldb::put_value(string key, string value) {
 //
 //
 //
-void ldb::get_value(string key) {
+void ldb::get_value(leveldb::Slice key) {
   if (key == "") return;
 
   string value;
   leveldb::Status status = db->Get(leveldb::ReadOptions(), key, &value);
 
   if (!status.ok()) {
-    cerr << "Not Found: [" << COLOR_BLUE << key << COLOR_NONE << "]" << endl;
+    cerr << "Not Found: [" << COLOR_BLUE << key.ToString() << COLOR_NONE << "]" << endl;
   } else {
     if (json > 0) {
       value = JSON(value, json);
@@ -45,7 +45,7 @@ void ldb::get_value(string key) {
 //
 //
 //
-void ldb::del_value(string key) {
+void ldb::del_value(leveldb::Slice key) {
   leveldb::WriteOptions writeOptions;
   leveldb::Status status;
 
